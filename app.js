@@ -1,27 +1,29 @@
+
 const express = require("express");
-const app = express();
-require("dotenv").config();
-const port = process.env.PORT;
-
 const mongoose = require("mongoose");
+const postsRoute = require("./routes/posts_route");
+require("dotenv").config();
 
+const app = express();
+
+// Middleware to parse JSON bodies
+app.use(express.json());
+
+// Use the posts route
+app.use("/posts", postsRoute);
+
+// Connect to MongoDB
 mongoose.connect(process.env.DB_CONNECTION, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+}).then(() => {
+  console.log("Connected to MongoDB");
+}).catch((error) => {
+  console.error("Error connecting to MongoDB:", error);
 });
 
-const db = mongoose.connection;
-
-db.on("error", (error) => console.error(error));
-db.once("open", () => console.log("Connected to database"));
-
-const bodyParser = require("body-parser");
-app.use(bodyParser.json()); 
-app.use(bodyParser.urlencoded({ extended: true }));
-
-const postsRoute = require("./routes/posts_route");
-app.use("/post", postsRoute);
-
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
