@@ -1,7 +1,7 @@
-
 const express = require("express");
 const mongoose = require("mongoose");
 const postsRoute = require("./routes/posts_route");
+const commentsRoute = require("./routes/comments_route");
 require("dotenv").config();
 
 const app = express();
@@ -11,6 +11,9 @@ app.use(express.json());
 
 // Use the posts route
 app.use("/posts", postsRoute);
+
+// Use the comments route
+app.use("/comments", commentsRoute);
 
 // Connect to MongoDB
 mongoose.connect(process.env.DB_CONNECTION, {
