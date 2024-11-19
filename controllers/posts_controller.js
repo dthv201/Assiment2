@@ -23,10 +23,11 @@ const createPost = async (req, res) => {
 };
 
 const getAllPosts = async (req, res) => {
-  const filter = req.query.owner;
+  const filter = req.query.sender;
+  
   try {
     if (filter) {
-      const posts = await postModel.find({ owner: filter });
+      const posts = await postModel.find({ sender: filter });
       res.send(posts);
     } else {
       const posts = await postModel.find();
