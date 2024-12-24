@@ -49,16 +49,20 @@ export class BaseController<T> {
     }
   };
 
-  async update (req: Request, res: Response) {
+  async update(req: Request, res: Response) {
     const id = req.params.id;
     try {
-        const rs = await this.model.findOneAndUpdate({ _id: id });
-        res.status(200).send(rs);
+      const updatedItem = await this.model.findOneAndUpdate(
+        { _id: id },
+        req.body,
+        { new: true }
+      );
+      res.status(200).send(updatedItem);
     } catch (error) {
-        res.status(400).send(error);
+      res.status(400).send(error);
     }
-  
   };
+  
   async deleteItem(req: Request, res: Response) {
     const id = req.params.id;
     try {

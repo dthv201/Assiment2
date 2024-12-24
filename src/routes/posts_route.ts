@@ -11,6 +11,7 @@ router.get("/:id", (req, res) => {
 
 
 router.post("/", postsController.create.bind(postsController));
+router.put("/:id", postsController.update.bind(postsController));
 
 router.delete("/:id", postsController.deleteItem.bind(postsController));
 

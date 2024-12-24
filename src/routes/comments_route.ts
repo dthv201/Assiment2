@@ -1,18 +1,13 @@
-import express from "express";
-const router = express.Router();
+import express, { RequestHandler } from "express";
 import commentsController from "../controllers/comments_controller";
-// import { authMiddleware } from "../controllers/auth_controller";
 
-router.get("/", commentsController.getAll.bind(commentsController));
+const router = express.Router();
 
-router.get("/:id", (req, res) => {
-    commentsController.getById(req, res);
-});
-
-router.post("/", commentsController.create.bind(commentsController));
-
-router.put("/:id", commentsController.update.bind(commentsController));
-
-router.delete("/:id", commentsController.deleteItem.bind(commentsController));
+// Define the routes
+router.get("/", commentsController.getAll as RequestHandler);
+router.get("/:id", commentsController.getById as RequestHandler);
+router.post("/", commentsController.create.bind(commentsController) as RequestHandler);
+router.put("/:id", commentsController.update.bind(commentsController) as RequestHandler);
+router.delete("/:id", commentsController.deleteItem.bind(commentsController) as RequestHandler);
 
 export default router;

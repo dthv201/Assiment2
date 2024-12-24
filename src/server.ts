@@ -7,9 +7,12 @@ import postsRoutes from "./routes/posts_route";
 import commentsRoutes from "./routes/comments_route";
 import bodyParser from "body-parser";
 
+const db = mongoose.connection;
+db.on("error", (error) => console.error(error));
+db.once("open", () => console.log("Connected to database"));
+
 const initApp = async () => {
   return new Promise<Express>((resolve, reject) => {
-    const db = mongoose.connection;
     db.on("error", (err) => {
       console.error(err);
     });
@@ -17,11 +20,11 @@ const initApp = async () => {
       console.log("Connected to MongoDB");
     });
 
-    if (process.env.MONGO_URI === undefined) {
+    if (process.env.DB_CONNECTION === undefined) {
       console.error("MONGO_URI is not set");
       reject();
     } else {
-      mongoose.connect(process.env.MONGO_URI).then(() => {
+      mongoose.connect(process.env.DB_CONNECTION).then(() => {
         console.log("initApp finish");
 
         app.use(bodyParser.json());

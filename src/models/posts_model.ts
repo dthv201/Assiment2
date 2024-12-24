@@ -1,20 +1,23 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose from "mongoose";
 
-// Define an interface for the Post entity
-export interface IPost extends Document {
-  title: string;
-  content: string;
-  author: mongoose.Types.ObjectId; 
+export interface iPost {
+  title: String,
+  content: String,
+  owner: String,
 }
 
-
-const postSchema: Schema<IPost> = new mongoose.Schema({
-  title: { type: String, required: true },
-  content: String ,
-  //Here it will be refrence to a user
-  author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  
+const postSchema = new mongoose.Schema<iPost>({
+  title: {
+    type: String,
+    required: true,
+  },
+  content: String,
+  owner: {
+    type: String,
+    required: true,
+  },
 });
 
+const postModel = mongoose.model<iPost>("posts", postSchema);
 
-export const postModel = mongoose.model<IPost>('Post', postSchema);
+export default postModel;
