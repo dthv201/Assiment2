@@ -15,7 +15,7 @@ GET http://localhost:3000/posts
 
 ###
 #3.	Get a Post by ID
-GET http://localhost:3000/posts/676aed82c92c60d154870c7d
+GET http://localhost:3000/posts/676afb09c92c60d154870ca8
 
 ###
 #4.	Get Posts by Sender: 
@@ -49,20 +49,20 @@ Content-Type: application/json
 ###
 
 # Get a comment by coment ID
-GET http://localhost:3000/comments/674054ac7bdd6553eea58e40
+GET http://localhost:3000/comments/676aedddc92c60d154870c88
 
 ###
 
 # Get all comments
 GET http://localhost:3000/comments
 
-###!!!!
+
 # Get comments by post ID
 GET http://localhost:3000/comments?postId=674048e7f4934155c7143552
 
 ###
-# Update a comment -dosen't work
-PUT http://localhost:3000/comments/674048e7f4934155c7143552
+# Update a comment 
+PUT http://localhost:3000/comments/676aeddcc92c60d154870c86
 Content-Type: application/json
 
 {
@@ -72,7 +72,7 @@ Content-Type: application/json
 ###
 
 # Delete a comment
-DELETE http://localhost:3000/comments/674051ff6eae7051ad4c2f01
+DELETE http://localhost:3000/comments/676aeddcc92c60d154870c86
 
 
 

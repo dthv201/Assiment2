@@ -33,9 +33,9 @@ const initApp = async () => {
         app.use("/posts", postsRoutes);
         app.use("/comments", commentsRoutes);
 
-        app.get("/about", (req, res) => {
-          res.send("About page");
-        });
+        // app.get("/about", (req, res) => {
+        //   res.send("About page");
+        // });
         resolve(app);
       });
     }
