@@ -6,7 +6,7 @@ Content-Type: application/json
 
 {
     "title": "New Post",
-    "owner": "I sent this",
+    "owner": "Gaya vish",
     "content": "This is the content of the post."
 }
 ###
@@ -15,28 +15,28 @@ GET http://localhost:3000/posts
 
 ###
 #3.	Get a Post by ID
-GET http://localhost:3000/posts/676afb09c92c60d154870ca8
+GET http://localhost:3000/posts/676b146ffa6ba92a2d682b51
 
 ###
 #4.	Get Posts by Sender: 
 
-GET http://localhost:3000/posts?owner=Gaya vish
+GET http://localhost:3000/posts?owner=Eliav
 
 
 ###
 #5. Update a Post: 
-PUT http://localhost:3000/posts/676aed82c92c60d154870c7d
+PUT http://localhost:3000/posts/676b146ffa6ba92a2d682b51
 Content-Type: application/json
 
 {
     "title": "Updated Title",
-    "owner": "Updated Owner",
+    "owner": "Updated Owner girl",
     "content": "Updated Content"
 }
 
 ###
 
-#1 Create a new comment
+#1 Create a new comment✔️
 POST http://localhost:3000/comments
 Content-Type: application/json
 
@@ -48,21 +48,21 @@ Content-Type: application/json
 
 ###
 
-# Get a comment by coment ID
-GET http://localhost:3000/comments/676aedddc92c60d154870c88
+# Get a comment by coment ID ✔️
+GET http://localhost:3000/comments/676b161f2847f1e26a0c28aa
 
 ###
 
-# Get all comments
+# Get all comments✔️
 GET http://localhost:3000/comments
 
 
-# Get comments by post ID
-GET http://localhost:3000/comments?postId=674048e7f4934155c7143552
+# Get comments by post ID✔️
+GET http://localhost:3000/comments?674048e7f4934155c7143552
 
 ###
-# Update a comment 
-PUT http://localhost:3000/comments/676aeddcc92c60d154870c86
+# Update a comment ✔️
+PUT http://localhost:3000/comments/676b146e52d6f66f44b1581e
 Content-Type: application/json
 
 {
@@ -71,8 +71,8 @@ Content-Type: application/json
 
 ###
 
-# Delete a comment
-DELETE http://localhost:3000/comments/676aeddcc92c60d154870c86
+# Delete a comment✔️
+DELETE http://localhost:3000/comments/676b146e52d6f66f44b1581e
 
 
 

@@ -1,81 +1,80 @@
-import { Request, Response } from "express-serve-static-core";
+import { Request, Response } from "express";
 import { Model } from "mongoose";
 
-export class BaseController<T> {
-  model: Model<T>;
-  constructor(model: Model<T>) {
-    this.model = model;
-  }
-
-  async getAll(req: Request, res: Response) {
-    const authorFilter = req.query.sender;
-    try {
-      if (authorFilter) {
-        const posts = await this.model.find({ author:authorFilter });
-        res.status(200).send(posts);
-      } else {
-        const posts = await this.model.find();
-        res.status(200).send(posts);
-      }
-    } catch (err) {
-      console.log(err);
-      res.status(400).send(err);
+class BaseController<T> {
+    model: Model<T>;
+    constructor(model: any) {
+        this.model = model;
     }
-  };
 
-  async getById(req: Request, res: Response) {
-    const id = req.params.id;
-    try {
-      const post = await this.model.findById(id);
-      if (post === null) {
-        return res.status(404).send("Post not found");
-      } else {
-        return res.status(200).send(post);
-      }
-    } catch (err) {
-      console.log(err);
-      res.status(400).send(err);
-    }
-  };
-
-  async create(req: Request, res: Response) {
-    console.log(req.body);
-    try {
-      const post = await this.model.create(req.body);
-      res.status(201).send(post);
-    } catch (err) {
-      res.status(400);
-      res.send(err);
-    }
-  };
-
-  async update(req: Request, res: Response) {
-    const id = req.params.id;
-    try {
-      const updatedItem = await this.model.findOneAndUpdate(
-        { _id: id },
-        req.body,
-        { new: true }
-      );
-      res.status(200).send(updatedItem);
-    } catch (error) {
-      res.status(400).send(error);
-    }
-  };
-  
-  async deleteItem(req: Request, res: Response) {
-    const id = req.params.id;
-    try {
-        const rs = await this.model.findByIdAndDelete(id);
-        res.status(200).send(rs);
-    } catch (error) {
+    async getAll(req: Request, res: Response) {
+      const { owner, postId } = req.query; // Extract query parameters
+    
+      try {
+        // Build a filter object based on query parameters
+        const filter: Record<string, any> = {};
+        if (owner) filter.owner = owner;
+        if (postId) filter.postId = postId;
+    
+        const items = await this.model.find(filter);
+        res.status(200).send(items);
+      } catch (error) {
         res.status(400).send(error);
+      }
     }
-};
-};
 
+    async getById(req: Request, res: Response) {
+        const id = req.params.id;
 
-const createController = <T>(model: Model<T>) => {
-  return new BaseController(model);
+        try {
+            const item = await this.model.findById(id);
+            if (item != null) {
+                res.send(item);
+            } else {
+                res.status(404).send("not found");
+            }
+        } catch (error) {
+            res.status(400).send(error);
+        }
+    };
+
+    async create(req: Request, res: Response) {
+        const body = req.body;
+        try {
+            const item = await this.model.create(body);
+            res.status(201).send(item);
+        } catch (error) {
+            res.status(400).send(error);
+        }
+    };
+    
+    async update(req: Request, res: Response): Promise<void> {
+      const id = req.params.id;
+      const body = req.body;
+      try {
+        const updatedItem = await this.model.findByIdAndUpdate(id, body, { new: true });
+        if (!updatedItem) {
+          res.status(404).send("not found");
+          return;
+        }
+        res.status(200).send(updatedItem);
+      } catch (error) {
+        res.status(400).send(error);
+      }
+    };
+    
+
+    async deleteItem(req: Request, res: Response) {
+        const id = req.params.id;
+        try {
+            const rs = await this.model.findByIdAndDelete(id);
+            res.status(200).send(rs);
+        } catch (error) {
+            res.status(400).send(error);
+        }
+    };
+
 }
-export default createController;
+
+
+export default BaseController
