@@ -61,6 +61,11 @@ describe("Comments test suite", () => {
       expect(response.body).toHaveLength(1);
     });
 
+    test("Comment test get all comments by owner", async () => {
+      const response = await request(app).get(`/comments?owner=${testComment.owner}`);
+      expect(response.statusCode).toBe(200);
+    });
+
   test("Get a comment by ID", async () => {
     const response = await request(app)
       .get(`/comments/${commentId}`)
@@ -104,29 +109,14 @@ describe("Comments test suite", () => {
   });
 
 
-
-
   test("Delete a non-existent comment", async () => {
-    // Invalid ID should return 400
     const response = await request(app)
       .delete("/comments/" + invalidComment)
-      .expect(400); // Adjust the test to expect 400 for invalid ID format
-  
-    // Validate error message in the body
+      .expect(400); 
+      
     expect(response.body).toHaveProperty("message");
   });
   
+  
 
-
-
-
-//   test("Create a comment with missing owner", async () => {
-//     const response = await request(app)
-//       .post("/comments")
-//       .send(invalidComment)
-//       .expect(400);
-
-//     expect(response.body).toHaveProperty("errors");
-//     expect(response.body.errors).toHaveProperty("owner");
-//   });
 });

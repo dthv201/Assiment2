@@ -4,12 +4,7 @@ const router = express.Router();
 import postsController from "../controllers/posts_controller";
 
 router.get("/", postsController.getAll.bind(postsController));
-
-router.get("/:id", (req, res) => {
-    postsController.getById(req, res);
-});
-
-
+router.get("/:id",  postsController.getById.bind(postsController));
 router.post("/", postsController.create.bind(postsController));
 router.put("/:id", postsController.update.bind(postsController));
 

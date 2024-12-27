@@ -29,6 +29,13 @@ const invalidPost = {
 };
 
 describe("Posts test suite", () => {
+  
+  test("Fail to get all post", async () => {
+
+   
+  });
+
+
   test("Post test get all posts", async () => {
     const response = await request(app).get("/posts");
     expect(response.statusCode).toBe(200);
@@ -62,6 +69,8 @@ describe("Posts test suite", () => {
     expect(response.body[0].owner).toBe(testPost.owner);
   });
 
+
+
   test("Test get post by id", async () => {
     const response = await request(app).get("/posts/" + postId);
     expect(response.statusCode).toBe(200);
@@ -85,6 +94,11 @@ describe("Posts test suite", () => {
     expect(response.body.content).toBe(updatedPost.content);
   });
 
+
+
+
+
+
     test("Test Delete a post in secsess", async () => {
     const response = await request(app).delete("/posts/" + postId);
     expect(response.statusCode).toBe(204);
@@ -92,19 +106,35 @@ describe("Posts test suite", () => {
     expect(response2.statusCode).toBe(404);
   });
 
-
-  test("Delete a non-existent post", async () => {
-    const invalidId = "invalidId"; // Use an invalid ID format
-    const response = await request(app)
-      .delete(`/posts/${invalidId}`)
-      .expect(400); // Adjust the test to expect 400 for invalid ID format
-
-    // Validate error message in the body
-    expect(response.body).toHaveProperty("message", "Invalid ID format");
+  test("Test not found updating a post", async () => {
+    const updatedPost = {
+      title: "Updated title",
+      content: "Updated content",
+    };
+    const response = await request(app).put(`/posts/${postId}`).send(updatedPost);
+  
+    expect(response.statusCode).toBe(404);
   });
 
   
+
+  test("Test delete a invalid postId", async () => {
+    const invalidId = "invalidId"; 
+    const response = await request(app)
+      .delete(`/posts/${invalidId}`)
+      .expect(400); 
+    expect(response.body).toHaveProperty("message", "Invalid ID format");
+  });
+
+  test("Test delete post not found", async () => {
+    const response = await request(app)
+      .delete(`/posts/${postId}`)
+      .expect(404); 
+    expect(response.body).toHaveProperty("message", "Post not found");
+  });
+
   
 
-  // I miss the delete Post
+
+
 });

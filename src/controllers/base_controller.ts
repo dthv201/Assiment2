@@ -63,16 +63,6 @@ class BaseController<T> {
     };
     
 
-  //   async deleteItem(req: Request, res: Response) {
-  //     const id = req.params.id;
-  //     try {
-  //         const rs = await this.model.findByIdAndDelete(id);
-  //         res.status(200).send("deleted");
-  //     } catch (error) {
-  //         res.status(400).send(error);
-  //     }
-  // };
-
   async deleteItem(req: Request, res: Response): Promise<void> {
     const itemId = req.params.id;
     if (!isValidObjectId(itemId)) {
