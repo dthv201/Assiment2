@@ -7,16 +7,7 @@ class PostController extends BaseController<iPost> {
         super(postModel);
     }
 
-    async create(req: Request, res: Response): Promise<void> {
-        // const userId = req.params.userId;
-        // if (!userId) {
-        //   res.status(400).send("User ID is required");
-        //   return Promise.resolve();
-        // }
-        // req.body.owner = userId;
-        super.create(req, res);
-    };
-      
+
 }
 
 export default new PostController();

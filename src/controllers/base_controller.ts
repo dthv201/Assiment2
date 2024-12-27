@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Model } from "mongoose";
+import { isValidObjectId, Model } from "mongoose";
 
 class BaseController<T> {
     model: Model<T>;
@@ -8,20 +8,19 @@ class BaseController<T> {
     }
 
     async getAll(req: Request, res: Response) {
-      const { owner, postId } = req.query; // Extract query parameters
-    
-      try {
-        // Build a filter object based on query parameters
-        const filter: Record<string, any> = {};
-        if (owner) filter.owner = owner;
-        if (postId) filter.postId = postId;
-    
-        const items = await this.model.find(filter);
-        res.status(200).send(items);
-      } catch (error) {
-        res.status(400).send(error);
-      }
-    }
+        const filter = req.query.owner;
+        try {
+            if (filter) {
+                const item = await this.model.find({ owner: filter });
+                res.send(item);
+            } else {
+                const items = await this.model.find();
+                res.send(items);
+            }
+        } catch (error) {
+            res.status(400).send(error);
+        }
+    };
 
     async getById(req: Request, res: Response) {
         const id = req.params.id;
@@ -64,16 +63,35 @@ class BaseController<T> {
     };
     
 
-    async deleteItem(req: Request, res: Response) {
-        const id = req.params.id;
-        try {
-            const rs = await this.model.findByIdAndDelete(id);
-            res.status(200).send(rs);
-        } catch (error) {
-            res.status(400).send(error);
-        }
-    };
+  //   async deleteItem(req: Request, res: Response) {
+  //     const id = req.params.id;
+  //     try {
+  //         const rs = await this.model.findByIdAndDelete(id);
+  //         res.status(200).send("deleted");
+  //     } catch (error) {
+  //         res.status(400).send(error);
+  //     }
+  // };
 
+  async deleteItem(req: Request, res: Response): Promise<void> {
+    const itemId = req.params.id;
+    if (!isValidObjectId(itemId)) {
+      res.status(400).json({ message: 'Invalid ID format' });
+      return;
+    }
+    try {
+      const deletedItem = await this.model.findByIdAndDelete(itemId);
+      if (!deletedItem) {
+        res.status(404).json({ message: 'Post not found' });
+        return;
+      }
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to delete item', error });
+    }
+  }
+    
+  
 }
 
 

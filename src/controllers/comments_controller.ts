@@ -8,8 +8,6 @@ class CommentsController extends BaseController<IComment> {
     super(commentsModel);
 }
 
-// async create(req: Request, res: Response): Promise<void> {
-//     super.create(req, res);
-//   };
+
 }
 export default new CommentsController();

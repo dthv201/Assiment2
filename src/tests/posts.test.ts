@@ -84,4 +84,27 @@ describe("Posts test suite", () => {
     expect(response.body.title).toBe(updatedPost.title);
     expect(response.body.content).toBe(updatedPost.content);
   });
+
+    test("Test Delete a post in secsess", async () => {
+    const response = await request(app).delete("/posts/" + postId);
+    expect(response.statusCode).toBe(204);
+    const response2 = await request(app).get("/posts/" + postId);
+    expect(response2.statusCode).toBe(404);
+  });
+
+
+  test("Delete a non-existent post", async () => {
+    const invalidId = "invalidId"; // Use an invalid ID format
+    const response = await request(app)
+      .delete(`/posts/${invalidId}`)
+      .expect(400); // Adjust the test to expect 400 for invalid ID format
+
+    // Validate error message in the body
+    expect(response.body).toHaveProperty("message", "Invalid ID format");
+  });
+
+  
+  
+
+  // I miss the delete Post
 });

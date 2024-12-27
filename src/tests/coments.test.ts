@@ -7,15 +7,19 @@ import { Express } from "express";
 let app: Express;
 
 beforeAll(async () => {
-  app = await initApp();
-  console.log("beforeAll");
-  await commentsModel.deleteMany();
-});
-
+    app = await initApp();
+    console.log("beforeAll");
+    await commentsModel.deleteMany({});
+    const comments = await commentsModel.find();
+    console.log("Comments after deleteMany:", comments); // This should log an empty array
+  });
+  
 afterAll(async () => {
   console.log("afterAll");
   await mongoose.connection.close();
 });
+
+  
 
 let commentId = "";
 const testComment = {
@@ -29,6 +33,14 @@ const invalidComment = {
 };
 
 describe("Comments test suite", () => {
+    test("Comment test get all comments initially empty", async () => {
+        await commentsModel.deleteMany({}); // Clear the database
+        const response = await request(app).get("/comments");
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveLength(0); // Now it should work
+      });
+      
+
   test("Create a new comment", async () => {
     const response = await request(app)
       .post("/comments")
@@ -43,52 +55,70 @@ describe("Comments test suite", () => {
     commentId = response.body._id;
   });
 
-   test("Post test get all comments", async () => {
+   test("Comment test get all comments", async () => {
       const response = await request(app).get("/comments");
       expect(response.statusCode).toBe(200);
-      expect(response.body).toHaveLength(0);
+      expect(response.body).toHaveLength(1);
     });
 
-//   test("Get a comment by ID", async () => {
-//     const response = await request(app)
-//       .get(`/comments/${commentId}`)
-//       .expect(200);
+  test("Get a comment by ID", async () => {
+    const response = await request(app)
+      .get(`/comments/${commentId}`)
+      .expect(200);
 
-//     expect(response.body).toHaveProperty("_id", commentId);
-//     expect(response.body.comment).toBe(testComment.comment);
-//     expect(response.body.postId).toBe(testComment.postId);
-//     expect(response.body.owner).toBe(testComment.owner);
-//   });
+    expect(response.body).toHaveProperty("_id", commentId);
+    expect(response.body.comment).toBe(testComment.comment);
+    expect(response.body.postId).toBe(testComment.postId);
+    expect(response.body.owner).toBe(testComment.owner);
+  });
 
-//   test("Update a comment", async () => {
-//     const updatedComment = {
-//       comment: "Updated comment",
-//       postId: "1234567890abcdef12345678",
-//       owner: "Updated Owner",
-//     };
+  test("Update a comment", async () => {
+    const updatedComment = {
+      comment: "Updated comment",
+      postId: "1234567890abcdef12345678",
+      owner: "Updated Owner",
+    };
 
-//     const response = await request(app)
-//       .put(`/comments/${commentId}`)
-//       .send(updatedComment)
-//       .expect(200);
+    const response = await request(app)
+      .put(`/comments/${commentId}`)
+      .send(updatedComment)
+      .expect(200);
 
-//     expect(response.body).toHaveProperty("_id", commentId);
-//     expect(response.body.comment).toBe(updatedComment.comment);
-//     expect(response.body.postId).toBe(updatedComment.postId);
-//     expect(response.body.owner).toBe(updatedComment.owner);
-//   });
+    expect(response.body).toHaveProperty("_id", commentId);
+    expect(response.body.comment).toBe(updatedComment.comment);
+    expect(response.body.postId).toBe(updatedComment.postId);
+    expect(response.body.owner).toBe(updatedComment.owner);
+  });
 
-//   test("Delete a comment", async () => {
-//     await request(app)
-//       .delete(`/comments/${commentId}`)
-//       .expect(204);
+  test("Test Delete a comment in secsess", async () => {
+    const response = await request(app).delete("/comments/" + commentId);
+    expect(response.statusCode).toBe(204);
+    const response2 = await request(app).get("/comments/" + commentId);
+    expect(response2.statusCode).toBe(404);
+  });
 
-//     const response = await request(app)
-//       .get(`/comments/${commentId}`)
-//       .expect(404);
+  test("Test Delete a comment not found", async () => {
+    const response = await request(app).delete("/comments/" + commentId);
+    expect(response.statusCode).toBe(404);
 
-//     expect(response.body).toHaveProperty("message", "Comment not found");
-//   });
+  });
+
+
+
+
+  test("Delete a non-existent comment", async () => {
+    // Invalid ID should return 400
+    const response = await request(app)
+      .delete("/comments/" + invalidComment)
+      .expect(400); // Adjust the test to expect 400 for invalid ID format
+  
+    // Validate error message in the body
+    expect(response.body).toHaveProperty("message");
+  });
+  
+
+
+
 
 //   test("Create a comment with missing owner", async () => {
 //     const response = await request(app)
