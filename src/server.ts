@@ -5,6 +5,7 @@ dotenv.config();
 import mongoose from "mongoose";
 import postsRoutes from "./routes/posts_route";
 import commentsRoutes from "./routes/comments_route";
+import authRoutes from "./routes/auth_route";
 import bodyParser from "body-parser";
 
 const db = mongoose.connection;
@@ -30,12 +31,10 @@ const initApp = async () => {
         app.use(bodyParser.json());
         app.use(bodyParser.urlencoded({ extended: true }));
 
+        app.use("/auth", authRoutes);
         app.use("/posts", postsRoutes);
         app.use("/comments", commentsRoutes);
 
-        // app.get("/about", (req, res) => {
-        //   res.send("About page");
-        // });
         resolve(app);
       });
     }
