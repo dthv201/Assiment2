@@ -32,14 +32,20 @@ const testUser: User = {
 }
 
 describe("Auth Tests", () => {
-  test("Auth test register", async () => {
+  test("Register new user", async () => {
     const response = await request(app).post(baseUrl + "/register").send(testUser);
     expect(response.statusCode).toBe(201);
+    expect(response.body.user).toHaveProperty('_id',);
+    expect(response.body.user.email).toBe(testUser.email);
   });
 
-  test("Auth test register fail", async () => {
-    const response = await request(app).post(baseUrl + "/register").send(testUser);
-    expect(response.statusCode).not.toBe(201);
+
+  test("Fail to register with missing fields", async () => {
+    const response = await request(app).post(`${baseUrl}/register`).send({
+      email: "missing@fields.com",
+    });
+    expect(response.statusCode).toBe(400);
+    expect(response.body).toHaveProperty("error");
   });
 
   test("Auth test register fail", async () => {
@@ -53,6 +59,7 @@ describe("Auth Tests", () => {
     });
     expect(response2.statusCode).not.toBe(200);
   });
+
 
   test("Auth test login", async () => {
     const response = await request(app).post(baseUrl + "/login").send(testUser);
@@ -76,6 +83,15 @@ describe("Auth Tests", () => {
     expect(refreshToken).not.toBe(testUser.refreshToken);
   });
 
+  test("Fail to login with invalid credentials", async () => {
+    const response = await request(app).post(`${baseUrl}/login`).send({
+      email: testUser.email,
+      password: "wrongpassword",
+    });
+    expect(response.statusCode).toBe(400);
+    expect(response.body).toHaveProperty("error");
+  });
+
   test("Auth test login fail", async () => {
     const response = await request(app).post(baseUrl + "/login").send({
       email: testUser.email,
@@ -88,6 +104,13 @@ describe("Auth Tests", () => {
       password: "sdfsd",
     });
     expect(response2.statusCode).not.toBe(200);
+
+    const response3 = await request(app).post(baseUrl + "/login").send({
+      email: "",
+      password: "",
+    });
+    expect(response3.statusCode).toBe(400);
+    expect(response3.body).toHaveProperty("error");
   });
 
   test("Auth test me", async () => {
@@ -136,6 +159,14 @@ describe("Auth Tests", () => {
     expect(response3.statusCode).not.toBe(200);
   });
 
+  test("Fail to refresh with invalid token", async () => {
+    const response = await request(app).post(`${baseUrl}/refresh`).send({
+      refreshToken: "invalidToken",
+    });
+    expect(response.statusCode).toBe(500);
+    expect(response.body).toHaveProperty("error");
+  });
+
   test("Test logout", async () => {
     const response = await request(app).post(baseUrl + "/login").send(testUser);
     expect(response.statusCode).toBe(200);
@@ -154,5 +185,77 @@ describe("Auth Tests", () => {
 
   });
 
+  test("Fail to refresh after logout", async () => {
+    const response = await request(app).post(`${baseUrl}/refresh`).send({
+      refreshToken: testUser.refreshToken,
+    });
+    expect(response.statusCode).toBe(500);
+    expect(response.body).toHaveProperty("error");
+  });
+
+
+  test("Logout fails with missing refresh token", async () => {
+    const response = await request(app).post(`${baseUrl}/logout`).send({});
+    expect(response.statusCode).toBe(400);
+    expect(response.body.error).toBe("Refresh token is required");
+  });
+
+  test("Logout fails with invalid refresh token", async () => {
+    const response = await request(app).post(`${baseUrl}/logout`).send({ refreshToken: "invalidToken" });
+    expect(response.statusCode).toBe(500);
+    expect(response.body).toHaveProperty("error");
+  });
+
+  test("Logout fails with server error", async () => {
+    jest.spyOn(userModel.prototype, "save").mockImplementationOnce(() => {
+      throw new Error("Database save error");
+    });
+
+    const response = await request(app).post(`${baseUrl}/logout`).send("");
+    expect(response.statusCode).toBe(400);
+    expect(response.body).toHaveProperty("error");
+
+    // Restore original implementation
+    jest.restoreAllMocks();
+  });
+
+  test("Logout fails with unknown error", async () => {
+    jest.spyOn(userModel.prototype, "save").mockImplementationOnce(() => {
+      throw "Unknown error"; // Throw a non-Error object
+    });
+
+    const response = await request(app).post(`${baseUrl}/logout`).send("");
+    expect(response.statusCode).toBe(400);
+    expect(response.body).toHaveProperty("error");
+    jest.restoreAllMocks();
+  });
+
+
+  test("Refresh fails with missing refresh token", async () => {
+    const response = await request(app).post(`${baseUrl}/refresh`).send({});
+    expect(response.statusCode).toBe(400);
+    expect(response.body.error).toBe("Refresh token is required");
+  });
+
+  test("Refresh fails with invalid refresh token", async () => {
+    const response = await request(app).post(`${baseUrl}/refresh`).send({ refreshToken: "invalidToken" });
+    expect(response.statusCode).toBe(500);
+    expect(response.body).toHaveProperty("error");
+  });
+
+
+  test("Refresh fails with unknown error", async () => {
+    jest.spyOn(userModel.prototype, "save").mockImplementationOnce(() => {
+      throw "Unknown error"; // Throw a non-Error object
+    });
+
+    const response = await request(app).post(`${baseUrl}/refresh`).send({refreshToken: testUser?.refreshToken});
+    expect(response.statusCode).toBe(500);
+    expect(response.body.error).toBe("Refresh failed");
+    expect(response.body.details).toBe("Unknown error occurred");
+
+    // Restore original implementation
+    jest.restoreAllMocks();
+  });
 
 });

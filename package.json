@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "ts-node ./src/app.ts",
     "start": "nodemon --exec ts-node ./src/app.ts",
+    "test": "jest --detectOpenHandles --forceExit",
     "testPost": "jest --detectOpenHandles --forceExit posts.test.ts",
     "testComment": "jest --detectOpenHandles --forceExit coments.test.ts",
     "testAuth": "jest --detectOpenHandles --forceExit auth.test.ts"
@@ -14,7 +15,7 @@
     "type": "git",
     "url": "https://github.com/dthv201/Assiment2.git"
   },
-  "author": "Gaya Vishna",
+  "author": "Gaya Vishna & Lior Oliel",
   "license": "ISC",
   "bugs": {
     "url": ""
