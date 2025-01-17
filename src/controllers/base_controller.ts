@@ -72,7 +72,7 @@ class BaseController<T> {
     try {
       const deletedItem = await this.model.findByIdAndDelete(itemId);
       if (!deletedItem) {
-        res.status(404).json({ message: 'Post not found' });
+        res.status(404).json({ message: 'not found' });
         return;
       }
       res.status(204).send();
