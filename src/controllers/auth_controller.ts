@@ -48,26 +48,23 @@ const login = async (req: Request, res: Response) => {
         }
 
         const tokens = generateToken(user._id);
-        if (!tokens) {
-            res.status(500).json({ error: 'Failed to generate tokens' });
-            return;
+        if (tokens) {
+            
+            if (!user.refreshToken) {
+                user.refreshToken = [];
+            }
+            user.refreshToken.push(tokens.refreshToken);
+            
+            await user.save();
+            
+            res.status(200).json({
+                accessToken: tokens.accessToken,
+                refreshToken: tokens.refreshToken,
+                _id: user._id,
+            });
         }
-
-        if (!user.refreshToken) {
-            user.refreshToken = [];
-        }
-        user.refreshToken.push(tokens.refreshToken);
-
-        await user.save();
-
-        res.status(200).json({
-            accessToken: tokens.accessToken,
-            refreshToken: tokens.refreshToken,
-            _id: user._id,
-        });
 
     } catch (err) {
-        console.error(err);
         if (err instanceof Error) {
             res.status(500).json({ error: 'Login failed', details: err.message });
         } else {
@@ -88,15 +85,11 @@ const logout = async (req: Request, res: Response) => {
         }
 
         const user = await verifyRefreshToken(refreshToken);
-        if (!user) {
-            res.status(400).json({ error: 'Invalid refresh token' });
-            return;
-        }
+
         await user.save();
         res.status(200).json({ message: 'Logged out successfully' });
         
     } catch (err) {
-        console.error(err);
         if (err instanceof Error) {
             res.status(500).json({ error: 'Logout failed', details: err.message });
         } else {
@@ -114,31 +107,25 @@ const refresh = async (req: Request, res: Response) => {
         }
 
         const user = await verifyRefreshToken(refreshToken);
-        if (!user) {
-            res.status(400).json({ error: 'Invalid refresh token' });
-            return;
+
+        if(user) {
+            const tokens = generateToken(user._id);
+            if (tokens) {
+                if (!user.refreshToken) {
+                    user.refreshToken = [];
+                }
+                user.refreshToken.push(tokens.refreshToken);
+                
+                await user.save();
+                
+                res.status(200).json({
+                    accessToken: tokens.accessToken,
+                    refreshToken: tokens.refreshToken,
+                    _id: user._id
+                });
+            }
         }
-
-        const tokens = generateToken(user._id);
-        if (!tokens) {
-            res.status(500).json({ error: 'Failed to generate tokens' });
-            return;
-        }
-
-        if (!user.refreshToken) {
-            user.refreshToken = [];
-        }
-        user.refreshToken.push(tokens.refreshToken);
-
-        await user.save();
-
-        res.status(200).json({
-            accessToken: tokens.accessToken,
-            refreshToken: tokens.refreshToken,
-            _id: user._id
-        });
     } catch (err) {
-        console.error(err);
         if (err instanceof Error) {
             res.status(500).json({ error: 'Refresh failed', details: err.message });
         } else {
