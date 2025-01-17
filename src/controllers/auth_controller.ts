@@ -85,10 +85,7 @@ const logout = async (req: Request, res: Response) => {
         }
 
         const user = await verifyRefreshToken(refreshToken);
-        if (!user) {
-            res.status(400).json({ error: 'Invalid refresh token' });
-            return;
-        }
+
         await user.save();
         res.status(200).json({ message: 'Logged out successfully' });
         
